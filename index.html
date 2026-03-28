@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpamShield AI — Intelligent Email Threat Detection</title>
+    <meta name="description"
+        content="Next-gen AI-powered spam email detector with explainable AI, analytics dashboard, and real-time phishing detection.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Animated background -->
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="app-wrapper">
+
+        <!-- Header / Brand -->
+        <header class="header" id="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="brand">SpamShield</span>
+                    <span class="badge">AI Model</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="sound-toggle" id="soundToggleBtn" title="Toggle Sound">
+                    <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                    <svg id="soundIconOff" style="display: none;" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <line x1="23" y1="9" x2="17" y2="15"></line>
+                        <line x1="17" y1="9" x2="23" y2="15"></line>
+                    </svg>
+                </button>
+                <div class="user-nav" id="userNav">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span class="user-name" id="userName">User</span>
+                    <a href="/api/logout" class="logout-btn" id="logoutBtn" title="Logout">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══ TAB NAVIGATION ═══ -->
+        <nav class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="dashboard" id="tabDashboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Dashboard</span>
+            </button>
+            <button class="tab-btn" data-tab="scan" id="tabScan">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Scan</span>
+            </button>
+            <button class="tab-btn" data-tab="analytics" id="tabAnalytics">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Analytics</span>
+            </button>
+        </nav>
+
+        <!-- ═══ DASHBOARD TAB ═══ -->
+        <section class="tab-panel active" id="panelDashboard">
+            <div class="main-card">
+                <div class="card-header">
+                    <h1 id="dashboardHeading">Email Scan <span class="gradient-text">Dashboard</span></h1>
+                    <p class="subtitle" id="dashboardSubtitle">Overview of your scanned emails, detection stats, and history.</p>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="stats-row" id="statsRow">
+                    <div class="stat-card stat-total">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statTotal">0</div>
+                            <div class="stat-label">Total Scans</div>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-spam">
+                        <div class="stat-icon">🚨</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statSpam">0</div>
+                            <div class="stat-label">Spam Detected</div>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-safe">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statHam">0</div>
+                            <div class="stat-label">Safe Emails</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="history-section">
+                    <div class="section-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Recent Scans
+                    </div>
+                    <div class="history-table-wrap" id="historyTableWrap">
+                        <table class="history-table" id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Email Preview</th>
+                                    <th>Result</th>
+                                    <th>Confidence</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                                <tr><td colspan="5" class="empty-state">No scans yet. Go to the Scan tab to analyze an email.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SCAN TAB ═══ -->
+        <section class="tab-panel" id="panelScan">
+            <div class="main-card">
+                <div class="card-header">
+                    <h1 id="mainHeading">Intelligent Email<br><span class="gradient-text">Threat Detection</span></h1>
+                    <p class="subtitle">Paste any email or upload a file and our AI will analyze it for spam signals, phishing links, and suspicious patterns.</p>
+                </div>
+
+                <!-- Input Section -->
+                <div class="input-section">
+                    <!-- File Upload -->
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="fileInput" accept=".txt,.eml,.msg" hidden>
+                        <div class="upload-content" id="uploadContent">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Drop a <strong>.txt / .eml</strong> file here or <strong>click to upload</strong></span>
+                        </div>
+                        <div class="upload-success" id="uploadSuccess" style="display:none;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span id="uploadFilename"></span>
+                        </div>
+                    </div>
+
+                    <div class="or-divider"><span>OR</span></div>
+
+                    <!-- Image OCR spam scan -->
+                    <div class="image-scan-section">
+                        <div class="image-scan-header">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            <span>Scan text inside an image</span>
+                        </div>
+                        <p class="image-scan-hint">Upload a JPG or PNG (posters, screenshots, fake offers). Works for small text, large headlines, and very high‑resolution images (they are scaled for OCR). If you also paste email content above, both are analyzed together.</p>
+                        <div class="image-scan-row">
+                            <input type="file" id="imageInput" class="image-file-input" accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png" aria-label="Choose image for OCR">
+                            <button type="button" class="scan-btn image-scan-btn" id="checkImageBtn">
+                                <span class="btn-content">
+                                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 15l-4-4"/></svg>
+                                    <span class="btn-label">Check Image</span>
+                                </span>
+                                <span class="btn-loading">
+                                    <span class="spinner"></span>
+                                    <span>Reading image…</span>
+                                </span>
+                            </button>
+                        </div>
+                        <p class="image-error-msg" id="imageErrorMsg" hidden></p>
+                        <div class="image-result-panel" id="imageResultPanel" hidden>
+                            <div class="image-result-block">
+                                <span class="image-result-label">Extracted text</span>
+                                <pre class="extracted-text-box" id="extractedTextBox"></pre>
+                            </div>
+                            <div class="image-verdict-row">
+                                <div class="image-verdict" id="imageVerdict"></div>
+                                <div class="image-confidence" id="imageConfidence"></div>
+                            </div>
+                            <p class="image-combined-note" id="imageCombinedNote" hidden></p>
+                        </div>
+                    </div>
+
+                    <div class="or-divider"><span>OR</span></div>
+
+                    <div class="textarea-wrapper" id="textareaWrapper">
+                        <div class="textarea-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            <span>Email Content</span>
+                            <span class="char-count" id="charCount">0 / 5,000</span>
+                        </div>
+                        <textarea id="emailText" placeholder="Paste the email body here to scan for spam patterns…"
+                            maxlength="5000" rows="6"></textarea>
+                    </div>
+
+                    <div class="predict-image-attach">
+                        <label class="predict-attach-label" for="predictImageAttach">Optional — image with text (JPG/PNG)</label>
+                        <input type="file" id="predictImageAttach" class="predict-attach-input"
+                            accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
+                            aria-label="Optional image to OCR and scan together with email text">
+                    </div>
+
+                    <button class="scan-btn" id="scanBtn" onclick="checkSpam()">
+                        <span class="btn-content">
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <span class="btn-label">Scan for Threats</span>
+                        </span>
+                        <span class="btn-loading">
+                            <span class="spinner"></span>
+                            <span>Analyzing…</span>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Result Section -->
+                <div class="result-section" id="resultSection">
+                    <div class="result-card" id="resultCard">
+                        <div class="result-icon" id="resultIcon"></div>
+                        <div class="result-info">
+                            <div class="result-verdict" id="resultVerdict"></div>
+                            <div class="result-desc" id="resultDesc"></div>
+                            <div class="model-badge" id="modelBadge" hidden></div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Buttons -->
+                    <div class="feedback-section" id="feedbackSection">
+                        <span class="feedback-label">Was this correct?</span>
+                        <button class="feedback-btn fb-correct" id="fbCorrect" onclick="sendFeedback('correct')">
+                            <span>👍</span> Correct
+                        </button>
+                        <button class="feedback-btn fb-wrong" id="fbWrong" onclick="sendFeedback('wrong')">
+                            <span>👎</span> Wrong
+                        </button>
+                        <span class="feedback-msg" id="feedbackMsg"></span>
+                    </div>
+
+                    <!-- Confidence Bar -->
+                    <div class="confidence-section" id="confidenceSection">
+                        <div class="confidence-header">
+                            <span class="confidence-label">Model Confidence</span>
+                            <span class="confidence-value" id="confidenceValue">—</span>
+                        </div>
+                        <div class="confidence-track">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Model Accuracy -->
+                    <div class="accuracy-section" id="accuracySection">
+                        <div class="accuracy-header">
+                            <span class="accuracy-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                                Model Accuracy
+                            </span>
+                            <span class="accuracy-value" id="accuracyValue">—</span>
+                        </div>
+                        <div class="accuracy-track">
+                            <div class="accuracy-fill" id="accuracyFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Explainable AI Section -->
+                    <div class="explain-card" id="explainCard">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Explainable AI — Why this result?
+                        </div>
+                        <ul class="explain-list" id="explainList"></ul>
+                    </div>
+
+                    <!-- Spam Words Highlight -->
+                    <div class="spam-words-card" id="spamWordsCard" style="display:none;">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Spam-Triggering Words
+                        </div>
+                        <div class="spam-words-list" id="spamWordsList"></div>
+                    </div>
+
+                    <!-- URL / Phishing Warnings -->
+                    <div class="url-card" id="urlCard" style="display:none;">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            URL &amp; Phishing Analysis
+                        </div>
+                        <div class="url-list" id="urlList"></div>
+                    </div>
+
+                    <!-- Sender Reputation -->
+                    <div class="reputation-card" id="reputationCard" style="display:none;">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Sender Reputation
+                        </div>
+                        <div class="reputation-info" id="reputationInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ ANALYTICS TAB ═══ -->
+        <section class="tab-panel" id="panelAnalytics">
+            <div class="main-card">
+                <div class="card-header">
+                    <h1>Spam <span class="gradient-text">Analytics</span></h1>
+                    <p class="subtitle">Visual trends and insights from your email scan history.</p>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            Spam vs Safe — Daily Trend
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="section-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            Daily Scan Volume
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-empty" id="analyticsEmpty">
+                    <p>📈 Scan some emails to see analytics data here!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by <strong>BERT</strong> (when available) + <strong>TF-IDF</strong> / <strong>Naive Bayes</strong> fallback · Hybrid rules ·
+                Explainable AI · Phishing Guard · OCR</p>
+        </footer>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
